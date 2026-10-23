@@ -1,0 +1,180 @@
+services:
+  # ==================== INFRASTRUCTURE ====================
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ./data/zookeeper:/var/lib/zookeeper/data
+      - ./data/zookeeper/logs:/var/lib/zookeeper/log
+    networks:
+      - bigdata-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 12
+    volumes:
+      - ./data/kafka:/var/lib/kafka/data
+    networks:
+      - bigdata-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+      - ./sql/clickhouse:/docker-entrypoint-initdb.d
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - bigdata-net
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics_password
+      POSTGRES_DB: livestream_analytics
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./sql/postgres:/docker-entrypoint-initdb.d
+    networks:
+      - bigdata-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - bigdata-net
+
+  # ==================== API ====================
+
+  api:
+    build:
+      context: src/api
+      dockerfile: ../../docker/api/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - clickhouse
+      - redis
+      - kafka
+    environment:
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=9000
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - DEBUG=true
+    networks:
+      - bigdata-net
+
+  # ==================== FRONTEND ====================
+
+  frontend:
+    build:
+      context: src/frontend
+      dockerfile: ../docker/frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    networks:
+      - bigdata-net
+
+  # ==================== STREAM PROCESSING ====================
+
+  flink-jobmanager:
+    build:
+      context: src/stream-processing
+      dockerfile: ../../docker/flink/Dockerfile
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      FLINK_PROPERTIES: "jobmanager.rpc.address: flink-jobmanager"
+    networks:
+      - bigdata-net
+
+  flink-taskmanager:
+    build:
+      context: src/stream-processing
+      dockerfile: ../../docker/flink/Dockerfile
+    command: taskmanager
+    depends_on:
+      - flink-jobmanager
+    environment:
+      FLINK_PROPERTIES: "jobmanager.rpc.address: flink-jobmanager"
+    networks:
+      - bigdata-net
+
+  # ==================== MONITORING ====================
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus:/etc/prometheus
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - bigdata-net
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./config/grafana:/etc/grafana/provisioning
+      - ./data/grafana:/var/lib/grafana
+    networks:
+      - bigdata-net
+
+networks:
+  bigdata-net:
+    driver: bridge
+
+volumes:
+  zookeeper_data:
+  kafka_data:
+  clickhouse_data:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,10 @@
+﻿data/
+node_modules/
+__pycache__/
+*.pyc
+*.log
+.env
+.DS_Store
+dist/
+build/
+*.egg-info/

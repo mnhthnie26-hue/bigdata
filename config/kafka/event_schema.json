@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Livestream Event",
+  "type": "object",
+  "required": ["event_id", "event_type", "timestamp", "stream_id", "viewer_id", "session_id"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique event identifier"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "view_start",
+        "view_end",
+        "heartbeat",
+        "quality_change",
+        "buffer_start",
+        "buffer_end",
+        "seek",
+        "pause",
+        "play",
+        "fullscreen_enter",
+        "fullscreen_exit",
+        "like",
+        "share",
+        "comment",
+        "chat",
+        "reaction",
+        "follow",
+        "subscribe",
+        "donation",
+        "error",
+        "ad_start",
+        "ad_end",
+        "ad_skip",
+        "ad_error"
+      ],
+      "description": "Type of event"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event timestamp in ISO 8601 format with milliseconds"
+    },
+    "stream_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stream identifier"
+    },
+    "viewer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Viewer identifier (user ID or anonymous ID)"
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Session identifier"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["web", "ios", "android", "tv", "desktop", "unknown"],
+      "description": "Platform where event originated"
+    },
+    "device_type": {
+      "type": "string",
+      "enum": ["mobile", "tablet", "desktop", "tv", "console", "unknown"],
+      "description": "Device type"
+    },
+    "os": {
+      "type": "string",
+      "description": "Operating system"
+    },
+    "browser": {
+      "type": "string",
+      "description": "Browser or app version"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "ISO 3166-1 alpha-2 country code"
+    },
+    "city": {
+      "type": "string",
+      "description": "City name"
+    },
+    "ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Viewer IP address"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "Full user agent string"
+    },
+    "video_time": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Current video playback position in seconds"
+    },
+    "video_duration": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total video duration in seconds"
+    },
+    "quality": {
+      "type": "string",
+      "enum": ["auto", "144p", "240p", "360p", "480p", "720p", "1080p", "1440p", "2160p", "4320p"],
+      "description": "Video quality"
+    },
+    "bitrate": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Current bitrate in kbps"
+    },
+    "buffer_health": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Buffer health ratio (0-1)"
+    },
+    "action": {
+      "type": "string",
+      "description": "Action for interaction events"
+    },
+    "error_code": {
+      "type": "string",
+      "description": "Error code for error events"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message for error events"
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Custom properties as key-value pairs"
+    }
+  }
+}
