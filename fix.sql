@@ -1,0 +1,1 @@
+UPDATE users SET email = 'admin@livestream.com', password_hash = '$2b$12$Rjr4954UlLTQ00EbMBQgke0hb3fIV.qYebXnp/QmVYMl2bbt6fQoe' WHERE username = 'admin';

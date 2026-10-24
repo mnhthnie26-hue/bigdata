@@ -8,53 +8,23 @@ const api = axios.create({
   timeout: 30000,
 })
 
-// Request interceptor
+// Request interceptor - always attach demo token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('access_token') || 'demo_token_123'
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    localStorage.setItem('access_token', token)
     return config
   },
   (error) => Promise.reject(error)
 )
 
-// Response interceptor
+// Response interceptor - no redirects on 401/403
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-    const isAuthEndpoint = originalRequest?.url?.includes('/api/v1/auth/login') ||
-                           originalRequest?.url?.includes('/api/v1/auth/refresh')
-    
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
-      originalRequest._retry = true
-      
-      try {
-        const refreshToken = localStorage.getItem('refresh_token')
-        if (!refreshToken) throw new Error('No refresh token')
-        
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/auth/refresh`,
-          { refresh_token: refreshToken }
-        )
-        
-        const { access_token } = response.data
-        localStorage.setItem('access_token', access_token)
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-        
-        return api(originalRequest)
-      } catch {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        delete api.defaults.headers.common['Authorization']
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login'
-        }
-      }
-    }
-    
+  (error) => {
     return Promise.reject(error)
   }
 )

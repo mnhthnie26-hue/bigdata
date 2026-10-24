@@ -43,7 +43,6 @@ async def get_clickhouse_client() -> ClickHouseClient:
             send_receive_timeout=30,
             compress=True,
             settings={
-                "use_numpy": True,
                 "max_threads": 4,
                 "max_memory_usage": "10000000000"
             }

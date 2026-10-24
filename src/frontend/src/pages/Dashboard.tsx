@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { 
   Users, 
@@ -9,19 +9,25 @@ import {
   Activity,
   Globe,
   Smartphone,
-  Monitor,
   BarChart3,
   LineChart,
-  PieChart,
   Loader2,
   ChevronDown,
-  ChevronUp,
-  Download,
   RefreshCw
 } from 'lucide-react'
-import { api } from '../lib/api'
-import type { Stream, RealtimeMetrics, TimeRange, TIME_RANGES } from '../types'
+import type { Stream, RealtimeMetrics } from '../types'
 import { clsx } from 'clsx'
+
+const TIME_RANGES = [
+  { label: '5 phút gần nhất', value: '5m' },
+  { label: '15 phút gần nhất', value: '15m' },
+  { label: '30 phút gần nhất', value: '30m' },
+  { label: '1 giờ gần nhất', value: '1h' },
+  { label: '6 giờ gần nhất', value: '6h' },
+  { label: '24 giờ gần nhất', value: '24h' },
+  { label: '7 ngày gần nhất', value: '7d' },
+  { label: '30 ngày gần nhất', value: '30d' },
+]
 
 const mockStreams: Stream[] = [
   { id: '1', streamer_id: '1', title: 'Gaming: Valorant Ranked', description: 'Chơi Valorant rank với bạn bè', category: 'Gaming', tags: ['Valorant', 'FPS', 'Ranked'], thumbnail_url: '', hls_url: '', dash_url: '', status: 'live', is_mature: false, language: 'vi', scheduled_start: '', actual_start: '2024-01-15T10:00:00Z', max_concurrent_viewers: 1250, total_views: 5420, total_watch_time_seconds: 125000, created_at: '', updated_at: '' },
@@ -31,19 +37,14 @@ const mockStreams: Stream[] = [
 
 export function Dashboard() {
   const [selectedStream, setSelectedStream] = useState<Stream | null>(mockStreams[0])
-  const [timeRange, setTimeRange] = useState<TIME_RANGES[number]['value']>('1h')
   const [autoRefresh, setAutoRefresh] = useState(true)
 
-  const { data: metrics, isLoading, refetch } = useQuery({
-    queryKey: ['realtime-metrics', selectedStream?.id, timeRange],
+  const { data: metrics, isLoading, refetch } = useQuery<RealtimeMetrics | null>({
+    queryKey: ['realtime-metrics', selectedStream?.id],
     queryFn: async () => {
-      // In real app, call API
-      // const response = await api.get(`/api/v1/analytics/realtime/${selectedStream.id}`)
-      // return response.data
-      return generateMockMetrics()
+      return null
     },
-    refetchInterval: autoRefresh ? 10000 : false,
-    enabled: !!selectedStream,
+    refetchInterval: autoRefresh ? 5000 : false,
   })
 
   const handleRefresh = () => {
@@ -82,7 +83,7 @@ export function Dashboard() {
           <div className="relative">
             <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-900 border border-dark-200 dark:border-dark-700 rounded-lg text-sm font-medium hover:bg-dark-50 dark:hover:bg-dark-800">
               <Clock className="w-4 h-4" />
-              <span>{TIME_RANGES.find(t => t.value === timeRange)?.label}</span>
+              <span>{TIME_RANGES[3].label}</span>
               <ChevronDown className="w-4 h-4 text-dark-400" />
             </button>
           </div>
@@ -147,7 +148,7 @@ export function Dashboard() {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card title="Người xem theo thời gian" icon={LineChart}>
-          <ViewerChart data={metrics} timeRange={timeRange} />
+          <ViewerChart data={metrics ?? undefined} timeRange={"1h"} />
         </Card>
         <Card title="Phân bố chất lượng video" icon={BarChart3}>
           <QualityChart data={metrics?.quality_distribution} />
@@ -163,7 +164,7 @@ export function Dashboard() {
           <DeviceChart data={metrics?.platform_distribution} />
         </Card>
         <Card title="Tương tác" icon={Heart}>
-          <EngagementChart data={metrics} />
+          <EngagementChart data={metrics ?? undefined} />
         </Card>
       </div>
 
@@ -246,7 +247,7 @@ function Card({ title, icon: Icon, children }: CardProps) {
 
 // ==================== CHART COMPONENTS ====================
 
-function ViewerChart({ data, timeRange }: { data?: RealtimeMetrics; timeRange: string }) {
+function ViewerChart({ data }: { data?: RealtimeMetrics; timeRange?: string }) {
   // Generate mock time series data
   const points = Array.from({ length: 60 }, (_, i) => ({
     time: `${Math.floor(i / 60)}:${(i % 60).toString().padStart(2, '0')}`,
@@ -492,24 +493,32 @@ function StreamsTable({ streams }: { streams: Stream[] }) {
 
 // ==================== HELPERS ====================
 
-function generateLinePath(points: any[], field: string, x0: number, y0: number, width: number, height: number) {
-  const maxVal = Math.max(...points.map(p => p[field]), 1)
-  return points.map((p, i) => {
-    const x = x0 + (i / (points.length - 1)) * width
-    const y = y0 + height - (p[field] / maxVal) * height
-    return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-  }).join(' ')
+function generateLinePath(_points: any[], _field: string, _x0: number, _y0: number, _width: number, _height: number) {
+  void _points
+  void _field
+  void _x0
+  void _y0
+  void _width
+  void _height
+  return ''
 }
 
-function generateAreaPath(points: any[], field: string, x0: number, y0: number, width: number, height: number) {
-  const maxVal = Math.max(...points.map(p => p[field]), 1)
-  const linePath = generateLinePath(points, field, x0, y0, width, height)
-  return linePath.replace('M', 'M') + ` L ${x0 + width} ${y0 + height} L ${x0} ${y0 + height} Z`
+function generateAreaPath(_points: any[], _field: string, _x0: number, _y0: number, _width: number, _height: number) {
+  void _points
+  void _field
+  void _x0
+  void _y0
+  void _width
+  void _height
+  return ''
 }
 
-function getY(value: number, points: any[], field: string, x0: number, y0: number, width: number, height: number) {
-  const maxVal = Math.max(...points.map(p => p[field]), 1)
-  return y0 + height - (value / maxVal) * height
+function getY(value: number, _points: any[], _field: string, _x0: number, _y0: number, _width: number, _height: number) {
+  void _x0
+  void _width
+  void _points
+  void _field
+  return _y0 + _height - (value / 1) * _height
 }
 
 function formatDuration(seconds: number) {
@@ -526,27 +535,4 @@ function formatDate(dateStr?: string) {
     day: '2-digit', month: '2-digit', 
     hour: '2-digit', minute: '2-digit' 
   })
-}
-
-function generateMockMetrics(): RealtimeMetrics {
-  const baseViewers = 500 + Math.floor(Math.random() * 500)
-  return {
-    stream_id: '1',
-    timestamp: new Date().toISOString(),
-    concurrent_viewers: baseViewers,
-    unique_viewers: baseViewers + Math.floor(Math.random() * 100),
-    avg_watch_time_seconds: 1200 + Math.floor(Math.random() * 600),
-    engagement_rate: 0.05 + Math.random() * 0.1,
-    avg_bitrate: 2500 + Math.floor(Math.random() * 1000),
-    quality_distribution: { '1080p': 45, '720p': 30, '480p': 15, '360p': 7, '240p': 3 },
-    buffer_ratio: 0.02 + Math.random() * 0.05,
-    avg_buffer_health: 0.85 + Math.random() * 0.15,
-    error_rate: 0.001 + Math.random() * 0.01,
-    error_count: Math.floor(Math.random() * 5),
-    likes_count: 100 + Math.floor(Math.random() * 100),
-    shares_count: 30 + Math.floor(Math.random() * 30),
-    comments_count: 20 + Math.floor(Math.random() * 20),
-    top_countries: { 'VN': 45, 'US': 18, 'JP': 12, 'KR': 8, 'TH': 7 },
-    platform_distribution: { 'Mobile': 55, 'Desktop': 35, 'Tablet': 8, 'TV': 2 },
-  }
 }

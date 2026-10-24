@@ -8,15 +8,15 @@ Real-time processing of viewer events with windowed aggregations.
 import json
 import os
 from datetime import datetime, timezone
-from typing import Dict, Any, Tuple
-from pyflink.datastream import StreamExecutionEnvironment, TimeCharacteristic
-from pyflink.datastream.connectors.kafka import FlinkKafkaConsumer, FlinkKafkaProducer
-from pyflink.datastream.functions import ProcessWindowFunction, ProcessFunction
-from pyflink.datastream.window import TumblingEventTimeWindows, SlidingEventTimeWindows
-from pyflink.common import WatermarkStrategy, Time, Duration, Types
-from pyflink.common.serialization import SimpleStringSchema
-from pyflink.datastream.state import ValueStateDescriptor, ListStateDescriptor
-from pyflink.common.configuration import Configuration
+from typing import Dict, Any, Tuple, Iterable
+from pyflink.datastream import StreamExecutionEnvironment, TimeCharacteristic  # type: ignore
+from pyflink.datastream.connectors.kafka import FlinkKafkaConsumer, FlinkKafkaProducer  # type: ignore
+from pyflink.datastream.functions import ProcessWindowFunction, ProcessFunction  # type: ignore
+from pyflink.datastream.window import TumblingEventTimeWindows, SlidingEventTimeWindows  # type: ignore
+from pyflink.common import WatermarkStrategy, Time, Duration, Types  # type: ignore
+from pyflink.common.serialization import SimpleStringSchema  # type: ignore
+from pyflink.datastream.state import ValueStateDescriptor, ListStateDescriptor  # type: ignore
+from pyflink.common.configuration import Configuration  # type: ignore
 import logging
 
 logging.basicConfig(level=logging.INFO)

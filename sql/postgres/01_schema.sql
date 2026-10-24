@@ -328,5 +328,5 @@ CREATE TRIGGER update_api_keys_updated_at BEFORE UPDATE ON api_keys FOR EACH ROW
 
 -- Default admin user (password: admin123 - change in production!)
 INSERT INTO users (email, username, password_hash, full_name, role, email_verified)
-VALUES ('admin@livestream.local', 'admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S', 'System Administrator', 'admin', true)
+VALUES ('admin@livestream.com', 'admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S', 'System Administrator', 'admin', true)
 ON CONFLICT (email) DO NOTHING;

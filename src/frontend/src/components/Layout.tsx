@@ -1,15 +1,12 @@
-import { ReactNode, useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Outlet, NavLink } from 'react-router-dom'
 import { 
   LayoutDashboard, 
-  Video, 
-  BarChart3, 
   Users, 
   AlertTriangle, 
   Settings,
   LogOut,
   Menu,
-  X,
   Sun,
   Moon,
   Bell,
@@ -23,8 +20,7 @@ import { clsx } from 'clsx'
 
 const navigation = [
   { name: 'Tổng quan', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Livestreams', href: '/streams', icon: Video },
-  { name: 'Phân tích', href: '/analytics', icon: BarChart3 },
+  { name: 'Phân tích', href: '/analytics', icon: Activity },
   { name: 'Người xem', href: '/viewers', icon: Users },
   { name: 'Cảnh báo', href: '/alerts', icon: AlertTriangle },
   { name: 'Cài đặt', href: '/settings', icon: Settings },
@@ -35,11 +31,9 @@ export function Layout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const navigate = useNavigate()
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
   }
 
   return (

@@ -1,0 +1,68 @@
+﻿auth.py:9: from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+auth.py:18: security = HTTPBearer(auto_error=False)
+auth.py:75: async def get_current_user(
+auth.py:82: async def get_current_user_optional(
+auth.py:88:         return await get_current_user(credentials)
+auth.py:93: def require_roles(*required_roles: str):
+auth.py:95:     async def role_checker(user: TokenData = Depends(get_current_user)) -> TokenData:
+__init__.py:6: from .auth import get_current_user, get_current_user_optional, require_roles, TokenData
+__init__.py:10:     "get_current_user",
+__init__.py:11:     "get_current_user_optional",
+__init__.py:12:     "require_roles",
+alerts.py:13: from middleware.auth import get_current_user, TokenData, require_roles
+alerts.py:126:     current_user: TokenData = Depends(get_current_user)
+alerts.py:194:     current_user: TokenData = Depends(require_roles("admin", "system"))
+alerts.py:214:     current_user: TokenData = Depends(get_current_user)
+alerts.py:230:     current_user: TokenData = Depends(get_current_user)
+alerts.py:266:     current_user: TokenData = Depends(get_current_user)
+alerts.py:291:     current_user: TokenData = Depends(require_roles("admin"))
+alerts.py:307:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+alerts.py:318:     current_user: TokenData = Depends(require_roles("admin"))
+alerts.py:339:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+alerts.py:355:     current_user: TokenData = Depends(require_roles("admin"))
+alerts.py:392:     current_user: TokenData = Depends(require_roles("admin"))
+alerts.py:409:     current_user: TokenData = Depends(get_current_user)
+alerts.py:440:     current_user: TokenData = Depends(get_current_user)
+alerts.py:499:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+analytics.py:13: from middleware.auth import get_current_user, TokenData, require_roles
+analytics.py:141:     current_user: TokenData = Depends(get_current_user)
+analytics.py:179:     current_user: TokenData = Depends(get_current_user)
+analytics.py:288:     current_user: TokenData = Depends(get_current_user)
+analytics.py:348:     current_user: TokenData = Depends(get_current_user)
+analytics.py:409:     current_user: TokenData = Depends(get_current_user)
+analytics.py:480:     current_user: TokenData = Depends(get_current_user)
+analytics.py:514:     current_user: TokenData = Depends(get_current_user)
+analytics.py:547:     current_user: TokenData = Depends(get_current_user)
+analytics.py:599:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+auth.py:20:     get_current_user,
+auth.py:81: async def get_me(current_user: TokenData = Depends(get_current_user)):
+dashboards.py:13: from middleware.auth import get_current_user, TokenData, require_roles
+dashboards.py:101:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:126:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:169:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:198:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:257:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:276:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:307:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:345:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:369:     current_user: TokenData = Depends(get_current_user)
+dashboards.py:507:     current_user: TokenData = Depends(get_current_user)
+streams.py:12: from middleware.auth import get_current_user, TokenData, require_roles
+streams.py:99:     current_user: TokenData = Depends(get_current_user)
+streams.py:159:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+streams.py:195:     current_user: TokenData = Depends(get_current_user)
+streams.py:211:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+streams.py:259:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+streams.py:281:     current_user: TokenData = Depends(get_current_user)
+streams.py:322:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+streams.py:354:     current_user: TokenData = Depends(require_roles("streamer", "admin"))
+streams.py:386:     current_user: TokenData = Depends(get_current_user)
+viewers.py:12: from middleware.auth import get_current_user, TokenData, require_roles
+viewers.py:113:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+viewers.py:176:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+viewers.py:199:     current_user: TokenData = Depends(require_roles("admin", "analyst"))
+viewers.py:250:     current_user: TokenData = Depends(get_current_user)
+viewers.py:267:     current_user: TokenData = Depends(get_current_user)
+viewers.py:291:     current_user: TokenData = Depends(get_current_user)
+viewers.py:381:     current_user: TokenData = Depends(get_current_user)
+viewers.py:429:     current_user: TokenData = Depends(require_roles("admin"))

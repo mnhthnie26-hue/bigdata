@@ -30,7 +30,7 @@ export function Login() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'admin@livestream.local',
+      email: 'admin@livestream.com',
       password: 'admin123',
     },
   })
@@ -144,7 +144,7 @@ export function Login() {
                 autoComplete="email"
                 {...register('email')}
                 className={clsx('input', errors.email && 'border-red-500 focus:ring-red-500')}
-                placeholder="admin@livestream.local"
+                placeholder="admin@livestream.com"
                 disabled={isLoading}
               />
               {errors.email && (
@@ -214,7 +214,7 @@ export function Login() {
               Tài khoản demo:
             </p>
             <div className="space-y-1 text-sm text-dark-600 dark:text-dark-400 font-mono">
-              <p>Email: <span className="text-dark-900 dark:text-white">admin@livestream.local</span></p>
+              <p>Email: <span className="text-dark-900 dark:text-white">admin@livestream.com</span></p>
               <p>Mật khẩu: <span className="text-dark-900 dark:text-white">admin123</span></p>
             </div>
           </div>

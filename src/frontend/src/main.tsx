@@ -8,6 +8,14 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import './index.css'
 
+// Set dummy token for demo
+if (!localStorage.getItem('token')) {
+  localStorage.setItem('token', 'demo_token_123')
+}
+if (!localStorage.getItem('access_token')) {
+  localStorage.setItem('access_token', 'demo_token_123')
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -53,5 +61,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )

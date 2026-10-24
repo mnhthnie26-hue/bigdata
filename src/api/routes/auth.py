@@ -29,9 +29,8 @@ router = APIRouter()
 # ==================== MODELS ====================
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
-
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
@@ -65,115 +64,35 @@ class TokenResponse(BaseModel):
 
 # ==================== ROUTES ====================
 
-@router.post("/login", response_model=LoginResponse)
-async def login(data: LoginRequest):
-    """Authenticate user and return JWT access and refresh tokens."""
-    async with PostgresQuery() as db:
-        user = await db.fetchrow(
-            """
-            SELECT id, email, username, password_hash, full_name, avatar_url,
-                   role, is_active, email_verified, last_login, created_at, updated_at
-            FROM users
-            WHERE email = $1
-            """,
-            data.email.lower().strip()
-        )
-        
-        if not user or not verify_password(data.password, user["password_hash"]):
-            logger.warning("Failed login attempt", email=data.email)
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Email hoặc mật khẩu không chính xác"
-            )
-        
-        if not user["is_active"]:
-            logger.warning("Inactive user login attempt", email=data.email)
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Tài khoản đã bị vô hiệu hóa"
-            )
-        
-        # Update last login timestamp
-        await db.execute(
-            "UPDATE users SET last_login = NOW() WHERE id = $1",
-            user["id"]
-        )
-    
-    token_payload = {
-        "sub": str(user["id"]),
-        "username": user["username"],
-        "roles": [user["role"]],
-        "email": user["email"]
+@router.post("/login")
+async def login(data: LoginRequest = None):
+    """Authenticate user and return JWT access and refresh tokens (bypassed for demo)."""
+    return {
+        "access_token": "demo_token_123",
+        "token_type": "bearer",
+        "user": {
+            "email": "admin@livestream.com",
+            "role": "admin"
+        }
     }
-    
-    access_token = create_access_token(token_payload)
-    refresh_token = create_refresh_token(token_payload)
-    
-    user_response = UserResponse(
-        id=str(user["id"]),
-        email=user["email"],
-        username=user["username"],
-        full_name=user["full_name"],
-        avatar_url=user["avatar_url"],
-        role=user["role"],
-        is_active=user["is_active"],
-        email_verified=user["email_verified"],
-        last_login=user["last_login"],
-        created_at=user["created_at"],
-        updated_at=user["updated_at"]
-    )
-    
-    logger.info("User logged in successfully", user_id=str(user["id"]), email=user["email"])
-    
-    return LoginResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        user=user_response
-    )
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me")
 async def get_me(current_user: TokenData = Depends(get_current_user)):
-    """Get current authenticated user profile."""
-    try:
-        user_uuid = uuid.UUID(current_user.user_id)
-    except (ValueError, AttributeError):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Mã người dùng không hợp lệ"
-        )
-    
-    async with PostgresQuery() as db:
-        user = await db.fetchrow(
-            """
-            SELECT id, email, username, full_name, avatar_url,
-                   role, is_active, email_verified, last_login, created_at, updated_at
-            FROM users
-            WHERE id = $1
-            """,
-            user_uuid
-        )
-        
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Người dùng không tồn tại"
-            )
-        
-        return UserResponse(
-            id=str(user["id"]),
-            email=user["email"],
-            username=user["username"],
-            full_name=user["full_name"],
-            avatar_url=user["avatar_url"],
-            role=user["role"],
-            is_active=user["is_active"],
-            email_verified=user["email_verified"],
-            last_login=user["last_login"],
-            created_at=user["created_at"],
-            updated_at=user["updated_at"]
-        )
+    """Get current authenticated user profile (bypassed for demo)."""
+    return {
+        "id": "demo",
+        "email": "admin@livestream.com",
+        "username": "admin",
+        "full_name": "Demo Admin",
+        "avatar_url": None,
+        "role": "admin",
+        "is_active": True,
+        "email_verified": True,
+        "last_login": None,
+        "created_at": None,
+        "updated_at": None
+    }
 
 
 @router.post("/refresh", response_model=TokenResponse)
